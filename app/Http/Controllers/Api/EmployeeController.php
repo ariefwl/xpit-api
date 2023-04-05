@@ -43,9 +43,39 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nip' => 'required'
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'nip' => 'required',
+                'name' => 'required',
+                'fungsional' => 'required',
+                'address' => 'required',
+                'user_dept_id' => 'required',
+                'company_id' => 'required',
+                'user_id' =>'required'
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ada kesalahan !',
+                    'data' => $validator->errors()
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+    
+            $data = $request->all();
+            $emp = Employee::create($data);
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Karyawan berhasil di simpan !',
+                'data' => $emp
+            ], Response::HTTP_CREATED); 
+        } catch (QueryException $e) {
+            $error = [
+                'error' => $e->getMessage()
+            ];
+            return response()->json($error, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
