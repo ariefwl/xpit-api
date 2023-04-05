@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class EmployeeController extends Controller
 {
@@ -12,7 +16,18 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $employee = Employee::all();
+            return response()->json([
+                'success' => true,
+                'data' => $employee
+            ]);
+        } catch (QueryException $e) {
+            $error = [
+                'error' => $e->getMessage()
+            ];
+            return response()->json($error, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -28,7 +43,9 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'nip' => 'required'
+        ]);
     }
 
     /**
